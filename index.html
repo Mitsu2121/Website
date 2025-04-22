@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flood Alert Website</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #f8fafc;
+    }
+
+    #cards {
+      flex: 1;
+      padding: 40px 30px;
+      overflow-y: auto;
+      background-color: #f0f4f8;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #1e3a8a;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p.description {
+      font-size: 1rem;
+      color: #555;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #search-bar {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto 30px auto;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #1e3a8a;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .card li {
+      padding: 6px 0;
+      color: #333;
+    }
+
+    .card li::before {
+      content: '• ';
+      color: #1e3a8a;
+      font-weight: bold;
+    }
+
+    .alert-section li {
+      font-weight: bold;
+      color: #b91d47;
+    }
+
+    #map {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 40vw;
+      height: 100vh;
+      border-left: 3px solid #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cards">
+    <h1>FloodSafe</h1>
+    <p class="description">Real-time flood alerts, evacuation info, and emergency guides by barangay</p>
+
+    <input type="text" id="search-bar" placeholder="Enter your barangay or district..." onkeyup="searchAlerts()" />
+
+    <div class="card alert-section">
+      <h2>Flood Alerts</h2>
+      <ul id="flood-alerts"></ul>
+    </div>
+    
+    <div class="card">
+      <h2>Evacuation Routes</h2>
+      <ul id="evacuation-routes"></ul>
+    </div>
+    
+
+    <div class="card">
+      <h2>Emergency Contacts</h2>
+      <ul>
+        <li>Fire Department: 911</li>
+        <li>Police Department: 100</li>
+        <li>Local Emergency Response: 123-456-7890</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Offline Survival Guide</h2>
+      <p>Downloadable guides on how to stay safe and what to prepare during flood events.</p>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    const locationData = {
+      "Sampaloc": {
+        floodLevel: 4,
+        action: "Seek higher ground immediately.",
+        routes: [
+          "España Blvd to Lacson Ave toward higher elevation.",
+          "Use side streets avoiding flooded areas around UST."
+        ]
+      },
+      "Tondo": {
+        floodLevel: 5,
+        action: "Mandatory evacuation advised.",
+        routes: [
+          "R-10 to Delpan Bridge towards Intramuros.",
+          "Use Capulong St. to reach safer ground."
+        ]
+      },
+      "Makati": {
+        floodLevel: 2,
+        action: "Monitor updates. Prepare emergency kits.",
+        routes: [
+          "Evacuation center at Fort Bonifacio High School.",
+          "Use Kalayaan Ave to reach safer zones."
+        ]
+      },
+      "Quezon City": {
+        floodLevel: 3,
+        action: "Evacuate within 3 hours.",
+        routes: [
+          "Via Commonwealth Ave to Batasan Complex safe zones.",
+          "Avoid Araneta underpasses during flooding."
+        ]
+      }
+    };
+  
+    function searchAlerts() {
+      const searchTerm = document.getElementById("search-bar").value.trim().toLowerCase();
+      const alertsContainer = document.getElementById("flood-alerts");
+      const routesContainer = document.getElementById("evacuation-routes");
+  
+      alertsContainer.innerHTML = "";
+      routesContainer.innerHTML = "";
+  
+      const foundKey = Object.keys(locationData).find(loc =>
+        loc.toLowerCase().includes(searchTerm)
+      );
+  
+      if (foundKey) {
+        const data = locationData[foundKey];
+  
+        // Show flood alert
+        const alertItem = document.createElement("li");
+        alertItem.textContent = `Flood Alert for ${foundKey}: Flood level at ${data.floodLevel} meters. ${data.action}`;
+        alertsContainer.appendChild(alertItem);
+  
+        // Show evacuation routes
+        data.routes.forEach(route => {
+          const routeItem = document.createElement("li");
+          routeItem.textContent = route;
+          routesContainer.appendChild(routeItem);
+        });
+  
+      } else {
+        // If not found, show a message or keep blank
+        const msg = document.createElement("li");
+        msg.textContent = "No alerts for this location.";
+        alertsContainer.appendChild(msg);
+      }
+    }
+  </script>
+  
+  <script>
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 14.5995, lng: 120.9842 },  // Metro Manila
+        zoom: 11,
+      });
+  
+      new google.maps.Marker({
+        position: { lat: 14.5995, lng: 120.9842 },
+        map,
+        title: "Metro Manila"
+      });
+    }
+  </script>
+  
+  
+
+  <script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-tipOCUCCYZISjoe9El0uwMRjZTrTXH8&callback=initMap"
+  async
+  defer
+></script>
+
+
+</body>
+</html>
