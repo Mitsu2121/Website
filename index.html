@@ -110,7 +110,6 @@
       <h2>Evacuation Routes</h2>
       <ul id="evacuation-routes"></ul>
     </div>
-    
 
     <div class="card">
       <h2>Emergency Contacts</h2>
@@ -164,50 +163,64 @@
         ]
       }
     };
-  
+
     function searchAlerts() {
       const searchTerm = document.getElementById("search-bar").value.trim().toLowerCase();
       const alertsContainer = document.getElementById("flood-alerts");
       const routesContainer = document.getElementById("evacuation-routes");
-  
+
       alertsContainer.innerHTML = "";
       routesContainer.innerHTML = "";
-  
+
+      if (searchTerm === "") {
+        const msg = document.createElement("li");
+        msg.textContent = "Please enter a location.";
+        alertsContainer.appendChild(msg);
+
+        const routeMsg = document.createElement("li");
+        routeMsg.textContent = "Please enter a location to view routes.";
+        routesContainer.appendChild(routeMsg);
+        return;
+      }
+
       const foundKey = Object.keys(locationData).find(loc =>
         loc.toLowerCase().includes(searchTerm)
       );
-  
+
       if (foundKey) {
         const data = locationData[foundKey];
-  
+
         // Show flood alert
         const alertItem = document.createElement("li");
         alertItem.textContent = `Flood Alert for ${foundKey}: Flood level at ${data.floodLevel} meters. ${data.action}`;
         alertsContainer.appendChild(alertItem);
-  
+
         // Show evacuation routes
         data.routes.forEach(route => {
           const routeItem = document.createElement("li");
           routeItem.textContent = route;
           routesContainer.appendChild(routeItem);
         });
-  
+
       } else {
-        // If not found, show a message or keep blank
         const msg = document.createElement("li");
         msg.textContent = "No alerts for this location.";
         alertsContainer.appendChild(msg);
+
+        const routeMsg = document.createElement("li");
+        routeMsg.textContent = "No evacuation routes found for this location.";
+        routesContainer.appendChild(routeMsg);
       }
     }
   </script>
-  
+
   <script>
     function initMap() {
       const map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 14.5995, lng: 120.9842 },  // Metro Manila
         zoom: 11,
       });
-  
+
       new google.maps.Marker({
         position: { lat: 14.5995, lng: 120.9842 },
         map,
@@ -215,15 +228,12 @@
       });
     }
   </script>
-  
-  
 
   <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-tipOCUCCYZISjoe9El0uwMRjZTrTXH8&callback=initMap"
-  async
-  defer
-></script>
-
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-tipOCUCCYZISjoe9El0uwMRjZTrTXH8&callback=initMap"
+    async
+    defer
+  ></script>
 
 </body>
 </html>
